@@ -65,17 +65,6 @@ namespace SudokuApp
             ExisteEnFila(numero, fila, celdasInvalidas);
             ExisteEnColumna(numero, columna, celdasInvalidas);
         }
-        private void VerificarRepetidos(List<Coordenadas> lista, List<Coordenadas> listaCoordenadas)
-        {
-            if (listaCoordenadas.Count > 1)
-            {
-                foreach (Coordenadas coordenadas in listaCoordenadas)
-                {
-                    if (!lista.Contains(coordenadas))
-                        lista.Add(coordenadas);
-                }
-            }
-        }
         private int ObtenerCuadrantePorCelda(int fila, int columna)
         {
             if ((fila >= 0 && fila <= 2) && (columna >= 0 && columna <= 2))
