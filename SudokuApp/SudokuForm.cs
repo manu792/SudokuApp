@@ -50,13 +50,10 @@ namespace SudokuApp
 
         private void EditingControl_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 48) // revisar que el numero ingresado NO sea 0
+            if (e.KeyChar == 8) //se permite utilizar la tecla backspace para borrar
+                e.Handled = false;
+            else if (e.KeyChar == 48 || !char.IsDigit(e.KeyChar)) //verifico que no se ingrese ni un 0 ni una letra
                 e.Handled = true;
-            else
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                    e.Handled = true;
-            }
         }
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)

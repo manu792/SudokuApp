@@ -26,9 +26,7 @@ namespace SudokuApp
         private Random numeroRandom;
         private int numerosPorCuadrante;
         private int filaMinima;
-        private int filaMaxima;
         private int columnaMinima;
-        private int columnaMaxima;
         
         public Sudoku()
         {
@@ -50,7 +48,7 @@ namespace SudokuApp
             List<Coordenadas> celdasInvalidas = new List<Coordenadas>();
             for (int fila = 0; fila < 9; fila++)
             {
-                for(int columna = 0; columna < 9; columna++)
+                for (int columna = 0; columna < 9; columna++)
                 {
                     VerificarReglas(grid[fila, columna], fila, columna, celdasInvalidas);
                 }
@@ -59,33 +57,20 @@ namespace SudokuApp
         }
         private void VerificarReglas(int numero, int fila, int columna, List<Coordenadas> celdasInvalidas)
         {
-            int cuadrante = ObtenerCuadrantePorCelda(fila, columna);
+            ObtenerCuadrantePorCelda(fila, columna);
 
-            ExisteEnCuadrante(numero, cuadrante, celdasInvalidas);
+            ExisteEnCuadrante(numero, celdasInvalidas);
             ExisteEnFila(numero, fila, celdasInvalidas);
             ExisteEnColumna(numero, columna, celdasInvalidas);
         }
         private int ObtenerCuadrantePorCelda(int fila, int columna)
         {
-            if ((fila >= 0 && fila <= 2) && (columna >= 0 && columna <= 2))
-                return 0;
-            if ((fila >= 0 && fila <= 2) && (columna >= 3 && columna <= 5))
-                return 1;
-            if ((fila >= 0 && fila <= 2) && (columna >= 6 && columna <= 8))
-                return 2;
-            if ((fila >= 3 && fila <= 5) && (columna >= 0 && columna <= 2))
-                return 3;
-            if ((fila >= 3 && fila <= 5) && (columna >= 3 && columna <= 5))
-                return 4;
-            if ((fila >= 3 && fila <= 5) && (columna >= 6 && columna <= 8))
-                return 5;
-            if ((fila >= 6 && fila <= 8) && (columna >= 0 && columna <= 2))
-                return 6;
-            if ((fila >= 6 && fila <= 8) && (columna >= 3 && columna <= 5))
-                return 7;
-            if ((fila >= 6 && fila <= 8) && (columna >= 6 && columna <= 8))
-                return 8;
-            return -1;
+            //Se usa cuadrante basado en indice 0
+            int anchoCuadrante = 3;
+
+            filaMinima = fila / anchoCuadrante * 3;
+            columnaMinima = columna / anchoCuadrante * 3;
+            return (columnaMinima + filaMinima * anchoCuadrante) / 3;
         }
         private void GenerarJuego()
         {
@@ -99,80 +84,21 @@ namespace SudokuApp
                 for (int cantidadNumeros = 0; cantidadNumeros < numerosPorCuadrante; cantidadNumeros++)
                 {
                     do{
-                        ObtenerFilaColumnaPorCuadrante(cuadrante);
-                        fila = numeroRandom.Next(filaMinima, filaMaxima);
-                        columna = numeroRandom.Next(columnaMinima, columnaMaxima);
-
-                        // Verifico que las coordenadas no sean repetidas y que el numero cumpla con las reglas del juego
-                        if (!CeldaTieneDato(fila, columna))
+                        fila = numeroRandom.Next(0, 9);
+                        columna = numeroRandom.Next(0, 9);
+                        if (ObtenerCuadrantePorCelda(fila, columna) == cuadrante)
                         {
-                            grid[fila, columna] = sudokuOriginal[fila, columna];
-                            GridOriginal[fila, columna] = sudokuOriginal[fila, columna];
-                            repetir = false;
+                            // Verifico que las coordenadas no sean repetidas
+                            if (!CeldaTieneDato(fila, columna))
+                            {
+                                grid[fila, columna] = sudokuOriginal[fila, columna];
+                                GridOriginal[fila, columna] = sudokuOriginal[fila, columna];
+                                repetir = false;
+                            }
                         }
                     }while (repetir);
                     repetir = true;
                 }
-            }
-        }
-        private void ObtenerFilaColumnaPorCuadrante(int cuadrante)
-        {
-            switch (cuadrante)
-            {
-                case 0:
-                    filaMaxima = 3;
-                    columnaMaxima = 3;
-                    filaMinima = 0;
-                    columnaMinima = 0;
-                    break;
-                case 1:
-                    filaMaxima = 3;
-                    columnaMaxima = 6;
-                    filaMinima = 0;
-                    columnaMinima = 3;
-                    break;
-                case 2:
-                    filaMaxima = 3;
-                    columnaMaxima = 9;
-                    filaMinima = 0;
-                    columnaMinima = 6;
-                    break;
-                case 3:
-                    filaMaxima = 6;
-                    columnaMaxima = 3;
-                    filaMinima = 3;
-                    columnaMinima = 0;
-                    break;
-                case 4:
-                    filaMaxima = 6;
-                    columnaMaxima = 6;
-                    filaMinima = 3;
-                    columnaMinima = 3;
-                    break;
-                case 5:
-                    filaMaxima = 6;
-                    columnaMaxima = 9;
-                    filaMinima = 3;
-                    columnaMinima = 6;
-                    break;
-                case 6:
-                    filaMaxima = 9;
-                    columnaMaxima = 3;
-                    filaMinima = 6;
-                    columnaMinima = 0;
-                    break;
-                case 7:
-                    filaMaxima = 9;
-                    columnaMaxima = 6;
-                    filaMinima = 6;
-                    columnaMinima = 3;
-                    break;
-                case 8:
-                    filaMaxima = 9;
-                    columnaMaxima = 9;
-                    filaMinima = 6;
-                    columnaMinima = 6;
-                    break;
             }
         }
         private void MezclarGrid()
@@ -289,20 +215,15 @@ namespace SudokuApp
         {
             return grid[fila, columna] != 0;
         }
-        private bool EsNumeroCero(int numero)
+        private void ExisteEnCuadrante(int numero, List<Coordenadas> celdasInvalidas)
         {
-            return numero == 0;
-        }
-        private void ExisteEnCuadrante(int numero, int cuadrante, List<Coordenadas> celdasInvalidas)
-        {
-            //List<Coordenadas> lista = new List<Coordenadas>();
             int contador = 0;
             bool existenCeldasInvalidas = false;
 
-            ObtenerFilaColumnaPorCuadrante(cuadrante);
-            for (int fila = filaMinima; fila < filaMaxima; fila++)
+            //ObtenerFilaColumnaPorCuadrante(cuadrante);
+            for (int fila = filaMinima; fila < filaMinima + 3; fila++)
             {
-                for (int columna = columnaMinima; columna < columnaMaxima; columna++)
+                for (int columna = columnaMinima; columna < columnaMinima + 3; columna++)
                 {
                     if (grid[fila, columna] == numero)
                     {
@@ -321,7 +242,6 @@ namespace SudokuApp
         }
         private void ExisteEnFila(int numero, int fila, List<Coordenadas> celdasInvalidas)
         {
-            //List<Coordenadas> lista = new List<Coordenadas>();
             int contador = 0;
             bool existenCeldasInvalidas = false;
 
@@ -336,10 +256,6 @@ namespace SudokuApp
                         existenCeldasInvalidas = true;
                         celdasInvalidas.Add(coordenadas);
                     }
-
-                    //contador++;
-                    //Coordenadas coordenadas = new Coordenadas(fila, columna);
-                    //lista.Add(coordenadas);
                 }
             }
             if (contador == 1 && existenCeldasInvalidas)
@@ -347,7 +263,6 @@ namespace SudokuApp
         }
         private void ExisteEnColumna(int numero, int columna, List<Coordenadas> celdasInvalidas)
         {
-            //List<Coordenadas> lista = new List<Coordenadas>();
             int contador = 0;
             bool existenCeldasInvalidas = false;
 
@@ -362,10 +277,6 @@ namespace SudokuApp
                         existenCeldasInvalidas = true;
                         celdasInvalidas.Add(coordenadas);
                     }
-
-                    //contador++;
-                    //Coordenadas coordenadas = new Coordenadas(fila, columna);
-                    //lista.Add(coordenadas);
                 }
             }
             if (contador == 1 && existenCeldasInvalidas)
