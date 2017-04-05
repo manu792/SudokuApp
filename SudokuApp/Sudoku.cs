@@ -20,13 +20,15 @@ namespace SudokuApp
         };
 
         public int[,] GridOriginal { get; private set; }
-        private int[,] grid;
+        private int[,] gridUsuario;
 
         private const int Cuadrantes = 9;
+        private const int Filas = 9;
+        private const int Columnas = 9;
         private Random numeroRandom;
         private int numerosPorCuadrante;
-        private int filaMinima;
-        private int columnaMinima;
+        private int filaMinimaCuadrante;
+        private int columnaMinimaCuadrante;
         
         public Sudoku()
         {
@@ -41,16 +43,16 @@ namespace SudokuApp
             
             MezclarGrid(); //Mezcla el grid original para obtener nuevos grids a partir de ese
             GenerarJuego();
-            return grid;
+            return gridUsuario;
         }
         public List<Coordenadas> ValidarSudoku()
         {
             List<Coordenadas> celdasInvalidas = new List<Coordenadas>();
-            for (int fila = 0; fila < 9; fila++)
+            for (int fila = 0; fila < Filas; fila++)
             {
-                for (int columna = 0; columna < 9; columna++)
+                for (int columna = 0; columna < Columnas; columna++)
                 {
-                    VerificarReglas(grid[fila, columna], fila, columna, celdasInvalidas);
+                    VerificarReglas(gridUsuario[fila, columna], fila, columna, celdasInvalidas);
                 }
             }
             return celdasInvalidas;
@@ -68,30 +70,30 @@ namespace SudokuApp
             //Se usa cuadrante basado en indice 0
             int anchoCuadrante = 3;
 
-            filaMinima = fila / anchoCuadrante * 3;
-            columnaMinima = columna / anchoCuadrante * 3;
-            return (columnaMinima + filaMinima * anchoCuadrante) / 3;
+            filaMinimaCuadrante = fila / anchoCuadrante * 3;
+            columnaMinimaCuadrante = columna / anchoCuadrante * 3;
+            return (columnaMinimaCuadrante + filaMinimaCuadrante * anchoCuadrante) / 3;
         }
         private void GenerarJuego()
         {
             int fila, columna;
             bool repetir = true;
 
-            grid = new int[9, 9];
-            GridOriginal = new int[9, 9];
+            gridUsuario = new int[Filas, Columnas];
+            GridOriginal = new int[Filas, Columnas];
             for (int cuadrante = 0; cuadrante < Cuadrantes; cuadrante++)
             {
                 for (int cantidadNumeros = 0; cantidadNumeros < numerosPorCuadrante; cantidadNumeros++)
                 {
                     do{
-                        fila = numeroRandom.Next(0, 9);
-                        columna = numeroRandom.Next(0, 9);
+                        fila = numeroRandom.Next(0, Filas);
+                        columna = numeroRandom.Next(0, Columnas);
                         if (ObtenerCuadrantePorCelda(fila, columna) == cuadrante)
                         {
                             // Verifico que las coordenadas no sean repetidas
                             if (!CeldaTieneDato(fila, columna))
                             {
-                                grid[fila, columna] = sudokuOriginal[fila, columna];
+                                gridUsuario[fila, columna] = sudokuOriginal[fila, columna];
                                 GridOriginal[fila, columna] = sudokuOriginal[fila, columna];
                                 repetir = false;
                             }
@@ -127,9 +129,9 @@ namespace SudokuApp
                 }
             }
             //Imprimo el sudoku generado en consola
-            for(int fila = 0; fila < 9; fila++)
+            for(int fila = 0; fila < Filas; fila++)
             {
-                for(int columna = 0; columna < 9; columna++)
+                for(int columna = 0; columna < Columnas; columna++)
                 {
                     if (columna == 8)
                         Console.WriteLine(sudokuOriginal[fila, columna]);
@@ -144,7 +146,9 @@ namespace SudokuApp
         private void IntercambiarFilas()
         {
             //Agarra un grupo de 3 filas y luego selecciona dos filas aleatorias de ese grupo y las intercambia
-            int grupo = numeroRandom.Next(3);
+            int grupos = Filas / 3;
+
+            int grupo = numeroRandom.Next(grupos);
 
             int fila1 = numeroRandom.Next(3);
             int fila2;
@@ -152,7 +156,7 @@ namespace SudokuApp
                 fila2 = numeroRandom.Next(3);
             while (fila1 == fila2);
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Filas; i++)
             {
                 int temp = sudokuOriginal[grupo * 3 + fila2, i];
                 sudokuOriginal[grupo * 3 + fila2, i] = sudokuOriginal[grupo * 3 + fila1, i];
@@ -168,18 +172,18 @@ namespace SudokuApp
         private void ConvertirColumnasEnFilas()
         {
             // Convierte cada columna de sudokuOriginal en una fila en la matriz temp
-            int[,] temp = new int[9, 9];
+            int[,] temp = new int[Filas, Columnas];
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Filas; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < Columnas; j++)
                 {
                     temp[i, j] = sudokuOriginal[j, i];
                 }
             }
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Filas; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < Columnas; j++)
                 {
                     sudokuOriginal[i, j] = temp[i, j];
                 }
@@ -188,16 +192,17 @@ namespace SudokuApp
         private void IntercambiarGruposFilas()
         {
             //Agarra dos grupos de 3 filas y los intercambia
-            int grupo1 = numeroRandom.Next(3);
+            int grupos = Filas / 3;
+            int grupo1 = numeroRandom.Next(grupos);
             int grupo2;
 
             do
-                grupo2 = numeroRandom.Next(3);
+                grupo2 = numeroRandom.Next(grupos);
             while (grupo1 == grupo2);
 
             for (int i = 0; i < 3; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (int j = 0; j < Filas; j++)
                 {
                     int temp = sudokuOriginal[grupo2 * 3 + i, j];
                     sudokuOriginal[grupo2 * 3 + i, j] = sudokuOriginal[grupo1 * 3 + i, j];
@@ -213,7 +218,7 @@ namespace SudokuApp
         }
         private bool CeldaTieneDato(int fila, int columna)
         {
-            return grid[fila, columna] != 0;
+            return gridUsuario[fila, columna] != 0;
         }
         private void ExisteEnCuadrante(int numero, List<Coordenadas> celdasInvalidas)
         {
@@ -221,11 +226,11 @@ namespace SudokuApp
             bool existenCeldasInvalidas = false;
 
             //ObtenerFilaColumnaPorCuadrante(cuadrante);
-            for (int fila = filaMinima; fila < filaMinima + 3; fila++)
+            for (int fila = filaMinimaCuadrante; fila < filaMinimaCuadrante + 3; fila++)
             {
-                for (int columna = columnaMinima; columna < columnaMinima + 3; columna++)
+                for (int columna = columnaMinimaCuadrante; columna < columnaMinimaCuadrante + 3; columna++)
                 {
-                    if (grid[fila, columna] == numero)
+                    if (gridUsuario[fila, columna] == numero)
                     {
                         contador++;
                         Coordenadas coordenadas = new Coordenadas(fila, columna);
@@ -245,9 +250,9 @@ namespace SudokuApp
             int contador = 0;
             bool existenCeldasInvalidas = false;
 
-            for (int columna = 0; columna < 9; columna++)
+            for (int columna = 0; columna < Columnas; columna++)
             {
-                if (grid[fila, columna] == numero)
+                if (gridUsuario[fila, columna] == numero)
                 {
                     contador++;
                     Coordenadas coordenadas = new Coordenadas(fila, columna);
@@ -266,9 +271,9 @@ namespace SudokuApp
             int contador = 0;
             bool existenCeldasInvalidas = false;
 
-            for (int fila = 0; fila < 9; fila++)
+            for (int fila = 0; fila < Filas; fila++)
             {
-                if (grid[fila, columna] == numero)
+                if (gridUsuario[fila, columna] == numero)
                 {
                     contador++;
                     Coordenadas coordenadas = new Coordenadas(fila, columna);

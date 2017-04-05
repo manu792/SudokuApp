@@ -7,7 +7,7 @@ namespace SudokuApp
 {
     public partial class SudokuForm : Form
     {
-        private const int filas = 9;
+        private const int Filas = 9;
         private Sudoku sudoku;
         private int[,] grid;
         private List<Coordenadas> celdasInvalidas;
@@ -26,7 +26,7 @@ namespace SudokuApp
 
         private void GenerarGrid()
         {
-            for (int i = 0; i < filas; i++)
+            for (int i = 0; i < Filas; i++)
             {
                 DataGridViewRow row = new DataGridViewRow();
                 row.Height = 45;
