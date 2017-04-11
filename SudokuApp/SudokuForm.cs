@@ -161,8 +161,6 @@ namespace SudokuApp
                     MessageBox.Show("Bien hecho!");
                 else
                     MessageBox.Show("Fallaste. Intenta un nuevo juego o haz click en Reiniciar para reiniciar este mismo juego.");
-
-                sudokuGrid.Enabled = false;
             }
             else
             {
